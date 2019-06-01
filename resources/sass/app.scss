@@ -1,0 +1,46 @@
+
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+.navbar-laravel {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.btn-condensed {
+	padding: 0;
+}
+
+
+//form-control custom styles
+input[type=text].form-control {
+	border: 1px solid $grey;
+	border-style: hidden hidden solid hidden;
+	border-radius: 0rem;
+	box-shadow: none !important;
+	background-color: none;
+}
+input[type=text].form-control:focus, 
+input[type=text].form-control:hover {
+	border-bottom: 2px solid $grey !important;
+	box-shadow: none !important;
+	background-color: $bggray;
+}
+
+input[type=text].form-control.invalid {
+	border-bottom: 1px solid $red;
+	background-color: none;
+}
+input[type=text].form-control.invalid:focus,
+input[type=text].form-control.invalid:hover, {
+	border-bottom: 2px solid $red !important;
+	background-color: $bgpink;
+}
+
+
