@@ -1763,6 +1763,7 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _error_handler_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../error-handler.js */ "./resources/js/error-handler.js");
 //
 //
 //
@@ -1863,6 +1864,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     post: {
@@ -1871,8 +1876,9 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      errors: new Errors(),
-      journalists: []
+      errors: new _error_handler_js__WEBPACK_IMPORTED_MODULE_0__["Errors"](),
+      journalists: [],
+      title: ""
     };
   },
   computed: {},
@@ -1880,44 +1886,74 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     cancel: function cancel() {
       this.reset();
-      $('formModal').modal('hide');
+      $('#formModal').modal('hide');
     },
     reset: function reset() {
-      this.errors = new Errors();
+      this.errors = new _error_handler_js__WEBPACK_IMPORTED_MODULE_0__["Errors"]();
     },
     validate: function validate() {
-      this.errors = [];
-      this.validationErrors = {};
-
       if (this.post.id !== undefined) {
         this.update();
       } else {
         this.store();
       }
     },
-    generateHref: function generateHref() {
-      if (this.post.href === "") {
-        this.post.href = this.post.title.replace(/[^\w\d\s-]*/g, '').replace(/[\s_]/g, '-').toLowerCase();
+    getPostTitle: function getPostTitle() {
+      this.title = this.post.title;
+    },
+    generatePostHref: function generatePostHref() {
+      if (this.post.href === "" || this.title !== this.post.title) {
+        this.post.href = this.post.title.trim().replace(/[^\w\d\s-]*/g, '').replace(/\s\s+/g, ' ').replace(/[\s_]/g, '-').replace(/--*/g, '-').replace(/^-|-$/g, '').toLowerCase();
       }
     },
     store: function store() {
-      console.log(this.post);
-      this.reset();
-      $('#formModal').modal('hide');
-      Event.$emit('reload');
+      var _this = this;
+
+      axios.post('/admin/post', {
+        journalist_id: this.post.journalist_id,
+        title: this.post.title,
+        href: this.post.href,
+        content: this.post.content,
+        status: this.post.status,
+        likes: this.post.likes,
+        dislikes: this.post.dislikes,
+        date_posted: this.post.date_posted
+      }).then(function (response) {
+        _this.cancel();
+
+        Event.$emit('reload');
+      })["catch"](function (error) {
+        return _this.errors.record(error.response.data.errors);
+      });
     },
     update: function update() {
-      console.log(this.post);
-      this.reset();
-      $('#formModal').modal('hide');
+      var _this2 = this;
+
+      axios.patch('/admin/post/' + this.post.id, {
+        journalist_id: this.post.journalist_id,
+        title: this.post.title,
+        href: this.post.href,
+        content: this.post.content,
+        status: this.post.status,
+        likes: this.post.likes,
+        dislikes: this.post.dislikes,
+        date_posted: this.post.date_posted
+      }).then(function (response) {
+        _this2.cancel();
+
+        Event.$emit('reload');
+      })["catch"](function (error) {
+        return _this2.errors.record(error.response.data.errors);
+      });
+      this.cancel();
       Event.$emit('reload');
     }
   },
   mounted: function mounted() {
-    var _this = this;
+    var _this3 = this;
 
     axios.get('/admin/journalist/all').then(function (response) {
-      _this.journalists = response.data.journalists;
+      _this3.journalists = response.data.journalists;
     });
   }
 });
@@ -37314,7 +37350,16 @@ var render = function() {
                             )
                           }
                         }
-                      })
+                      }),
+                      _vm._v(" "),
+                      _vm.errors.has("date_posted")
+                        ? _c("small", {
+                            staticClass: "form-text text-danger",
+                            domProps: {
+                              textContent: _vm._s(_vm.errors.get("date_posted"))
+                            }
+                          })
+                        : _vm._e()
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "form-group col-md-6" }, [
@@ -37334,24 +37379,30 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control form-control-sm",
+                          attrs: { name: "journalist_id" },
                           on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.$set(
-                                _vm.post,
-                                "journalist_id",
-                                $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
-                              )
-                            }
+                            change: [
+                              function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.post,
+                                  "journalist_id",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              },
+                              function($event) {
+                                return _vm.errors.clear($event.target.name)
+                              }
+                            ]
                           }
                         },
                         [
@@ -37378,7 +37429,18 @@ var render = function() {
                           })
                         ],
                         2
-                      )
+                      ),
+                      _vm._v(" "),
+                      _vm.errors.has("journalist_id")
+                        ? _c("small", {
+                            staticClass: "form-text text-danger",
+                            domProps: {
+                              textContent: _vm._s(
+                                _vm.errors.get("journalist_id")
+                              )
+                            }
+                          })
+                        : _vm._e()
                     ])
                   ]),
                   _vm._v(" "),
@@ -37405,7 +37467,8 @@ var render = function() {
                       },
                       domProps: { value: _vm.post.title },
                       on: {
-                        blur: _vm.generateHref,
+                        focus: _vm.getPostTitle,
+                        blur: _vm.generatePostHref,
                         input: function($event) {
                           if ($event.target.composing) {
                             return
@@ -37492,7 +37555,16 @@ var render = function() {
                           _vm.$set(_vm.post, "content", $event.target.value)
                         }
                       }
-                    })
+                    }),
+                    _vm._v(" "),
+                    _vm.errors.has("content")
+                      ? _c("small", {
+                          staticClass: "form-text text-danger",
+                          domProps: {
+                            textContent: _vm._s(_vm.errors.get("content"))
+                          }
+                        })
+                      : _vm._e()
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group" }, [
@@ -50079,35 +50151,123 @@ __webpack_require__.r(__webpack_exports__);
 /*!***************************************!*\
   !*** ./resources/js/error-handler.js ***!
   \***************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! exports provided: Errors */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = function () {
-  this.errors = {};
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Errors", function() { return Errors; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-  this.has = function (field) {
-    return this.errors.hasOwnProperty(field);
-  };
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-  this.any = function () {
-    return Object.keys(this.errors).length > 0;
-  };
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-  this.get = function (field) {
-    if (this.errors[field]) {
-      return this.errors[field][0];
+/*
+module.exports = function() {
+	this.errors = {};
+		
+	this.has = function(field){
+		return this.errors.hasOwnProperty(field);
+		//return _.has(this.errors, 'errors.'+field);
+	}
+	
+	this.any = function(){
+		return (Object.keys(this.errors).length > 0);
+	}
+	
+	this.get = function(field){
+		if(this.errors[field]){
+			return this.errors[field][0];
+		}		
+	}
+		
+	this.record = function(errors){
+		this.errors = errors;
+	}
+	
+	this.clear = function(field){
+		//sweet way to delete a property from an object
+		delete this.errors[field];  
+	}
+}
+*/
+var Errors =
+/*#__PURE__*/
+function () {
+  /**
+   * Create a new Errors instance.
+   */
+  function Errors() {
+    _classCallCheck(this, Errors);
+
+    this.errors = {};
+  }
+  /**
+   * Determine if an errors exists for the given field.
+   *
+   * @param {string} field
+   */
+
+
+  _createClass(Errors, [{
+    key: "has",
+    value: function has(field) {
+      return this.errors.hasOwnProperty(field);
     }
-  };
+    /**
+     * Determine if we have any errors.
+     */
 
-  this.record = function (errors) {
-    this.errors = errors;
-  };
+  }, {
+    key: "any",
+    value: function any() {
+      return Object.keys(this.errors).length > 0;
+    }
+    /**
+     * Retrieve the error message for a field.
+     *
+     * @param {string} field
+     */
 
-  this.clear = function (field) {
-    //sweet way to delete a property from an object
-    delete this.errors[field];
-  };
-};
+  }, {
+    key: "get",
+    value: function get(field) {
+      if (this.errors[field]) {
+        return this.errors[field][0];
+      }
+    }
+    /**
+     * Record the new errors.
+     *
+     * @param {object} errors
+     */
+
+  }, {
+    key: "record",
+    value: function record(errors) {
+      this.errors = errors;
+    }
+    /**
+     * Clear one or all error fields.
+     *
+     * @param {string|null} field
+     */
+
+  }, {
+    key: "clear",
+    value: function clear(field) {
+      if (field) {
+        delete this.errors[field];
+        return;
+      }
+
+      this.errors = {};
+    }
+  }]);
+
+  return Errors;
+}();
 
 /***/ }),
 
@@ -50118,9 +50278,9 @@ module.exports = function () {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
+__webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js"); //window.Errors = require('./error-handler.js');
 
-window.Errors = __webpack_require__(/*! ./error-handler.js */ "./resources/js/error-handler.js");
+
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
 window.Event = new Vue();
 Vue.component('post-form', __webpack_require__(/*! ./components/admin/PostForm.vue */ "./resources/js/components/admin/PostForm.vue")["default"]);
@@ -50171,6 +50331,14 @@ var app = new Vue({
         _this2.posts = response.data.posts;
       });
     },
+    initUpdate: function initUpdate(id) {
+      var _this3 = this;
+
+      axios.get('/admin/post/' + id).then(function (response) {
+        _this3.post = response.data.post;
+      });
+      $('#formModal').modal('show');
+    },
     initCreate: function initCreate() {
       this.post = {
         journalist_id: -1,
@@ -50183,6 +50351,20 @@ var app = new Vue({
         date_posted: this.today
       };
       $('#formModal').modal('show');
+    },
+    onRemove: function onRemove(key) {
+      var _this4 = this;
+
+      axios["delete"]('/admin/post/' + this.posts[key].id).then(function (response) {
+        _this4.posts[key].deleted_at = response.data.post.deleted_at;
+      });
+    },
+    onRestore: function onRestore(key) {
+      var _this5 = this;
+
+      axios.post('/admin/post/restore/' + this.posts[key].id).then(function (response) {
+        _this5.posts[key].deleted_at = response.data.post.deleted_at;
+      });
     }
   }
 });

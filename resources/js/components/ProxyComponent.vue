@@ -27,7 +27,7 @@ new Vue({
 
 -------------- Communication Between Siblings.Ep 13 ------------------------------
 
-//shared class so both siblings can use listen for an event and emit events
+//shared class so both siblings can use to listen for an event and emit events
 window.Event = new Vue();
 
 Vue.component('coupon', {
@@ -87,6 +87,9 @@ Vue.component('modal', {
 	`
 });
 
+
+
+
 -------------- inline-template Ep 19 -----------------------------
 
 OO Forms - create Errors class for handling errors
@@ -98,106 +101,26 @@ this.$data.errors: new Errors()
 
 
 
--------------------------------------------------------------------------------
-<template>
-	<form>	
-    	<div class="alert alert-danger" v-if="errors.length > 0">
-    		<p class="text-center" v-for="error in errors">{{error}}</p>
-    	</div>
-    	
-    	<div class="form-group">
-		    <label for="upTitle">Title:</label>
-		    <input id="upTitle" v-model="platform.title" type="text" :class="invalidTitle" placeholder="Title">
-		    <small v-if="validationErrors.title !== undefined" class="form-text text-danger">{{validationErrors.title[0]}}</small>
-		</div>						
-		<div class="form-group">
-    		<label for="upDescription">Description:</label>
-		    <textarea id="upDescription" class="form-control" v-model="platform.description" rows="3"></textarea>
-		</div>
-		<div class="form-group">
-			<button type="button" class="btn btn-secondary float-right" @click="validate">save</button>
-		</div>
-    </form>
-</template>
 
-<script>
-export default{
-	props: {
-		platform: {required:true}
-	},
-	
-	data(){
-		return {
-			errors: [],
-			validationErrors: {}
-		}
-	},
-	computed: {
-		invalidTitle() {
-			return this.validationErrors.title !== undefined ? 'form-control is-invalid invalid' : 'form-control';
-		}	
-	},
-	methods:{
-		validate() {
-			this.errors = [];
-			this.validationErrors = {};
-			if(this.platform.id !== undefined) {
-				this.update();
-			} else {
-				this.store();
-			}
-		},
-		
-		store() {
-			axios.post('/admin/platform', {
-	            title: this.platform.title,
-	            description: this.platform.description	            				
-			})
-			.then(response => {
-				$("#formModal").modal("hide");
-	            this.$parent.reset();
-			})
-			.catch(error => {
-				if(error.response.status === 500) {
-		            this.errors.push(error.response.data.message);
-	            }
-	            if(error.response.status === 422) {
-		            this.validationErrors = error.response.data.errors;
-		            let keys = [];           
-		            (Object.keys(error.response.data.errors)).forEach(key => {
-			            keys.push(key)
-		            });
-		            this.errors.push("Fix validation errors on inputs: " + keys.join(", "));
-	            }
-			});
-		},
-		
-		update() {
-			axios.patch('/admin/platform/' + this.platform.id, {
-	            title: this.platform.title,
-	            description: this.platform.description	            
-            })
-            .then(response => {	  
-	            $('#formModal').modal('hide');
-	            this.$parent.reset();
-            })
-            .catch(error => {
-	            if(error.response.status === 500) {
-		            this.errors.push(error.response.data.message);
-	            }
-	            if(error.response.status === 422) {
-		            this.validationErrors = error.response.data.errors;
-		            let keys = [];           
-		            (Object.keys(error.response.data.errors)).forEach(key => {
-			            keys.push(key)
-		            });
-		            this.errors.push("Fix validation errors on inputs: " + keys.join(", "));
-	            }	                         
-            });
-		}
-	}
-}
-</script>
+--------------- Ep 20 - OO Forms (global form object) -------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

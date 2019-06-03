@@ -77,7 +77,7 @@ class AdminWebsiteController extends Controller
      */
     public function show($id)
     {
-        $website = Website::find($id);
+        $website = Website::withTrashed()->where('id',$id)->first();
         return response()->json([
             'website' => $website
         ], 200);
@@ -119,12 +119,12 @@ class AdminWebsiteController extends Controller
 		    'description' 		=> 'nullable|string',
 		])->validate();
         
-        $website = Website::find($id);
+        $website = Website::withTrashed()->where('id',$id)->first($id);
         $website->name = $request->name;
         $website->url = $request->url;
         $website->description = $request->description;
 	    $website->save();
-	    
+	    	    
 	    return response()->json([
             'message' => 'Website update successful!',
             'website' => $website

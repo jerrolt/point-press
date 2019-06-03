@@ -1,6 +1,6 @@
 require('./bootstrap');
 
-window.Errors = require('./error-handler.js');
+//window.Errors = require('./error-handler.js');
 window.Vue = require('vue');
 window.Event = new Vue();
 
@@ -46,6 +46,12 @@ const app = new Vue({
 				this.posts = response.data.posts; 
 			});
 		},
+		initUpdate(id){					
+			axios.get('/admin/post/' + id).then(response => {
+				this.post = response.data.post;
+			});	
+			$('#formModal').modal('show');
+		},
 		initCreate(){
 			this.post = {
 				journalist_id: -1,
@@ -58,6 +64,18 @@ const app = new Vue({
 				date_posted: this.today				
 			}
 			$('#formModal').modal('show');
+		},
+		
+		onRemove(key){
+			axios.delete('/admin/post/' + this.posts[key].id).then(response => {
+				this.posts[key].deleted_at = response.data.post.deleted_at;
+			});
+		},
+		
+		onRestore(key){
+			axios.post('/admin/post/restore/' + this.posts[key].id).then(response => {
+				this.posts[key].deleted_at = response.data.post.deleted_at;
+			});
 		}
 	}
 });

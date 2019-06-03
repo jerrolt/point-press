@@ -17,19 +17,21 @@
 		<div class="form-group col-md-6">
 			<label class="col-form-label">Date:</label>
 			<input class="form-control" :class="{'is-invalid invalid':errors.has('date_posted')}" name="date_posted" v-model="post.date_posted" type="text" placeholder="yyyy-mm-dd">
+			<small class="form-text text-danger" v-if="errors.has('date_posted')" v-text="errors.get('date_posted')"></small>
 		</div>
 		<div class="form-group col-md-6">
 			<label class="col-form-label">Journalist:</label>
-			<select class="form-control form-control-sm" v-model="post.journalist_id">
+			<select class="form-control form-control-sm" v-model="post.journalist_id" name="journalist_id" @change="errors.clear($event.target.name)">
 				<option disabled value="-1">Journalist</option>
 				<option v-for="(journalist, key) in journalists" :value="journalist.id">{{journalist.firstname+' '+journalist.lastname}}</option>
 			</select>
+			<small class="form-text text-danger" v-if="errors.has('journalist_id')" v-text="errors.get('journalist_id')"></small>
 		</div>
 	</div>
 	
 	<div class="form-group">
 	    <label class="col-form-label">Title:</label>
-	    <input class="form-control" :class="{'is-invalid invalid':errors.has('title')}" name="title" v-model="post.title" type="text" placeholder="Post Title" @blur="generateHref">
+	    <input class="form-control" :class="{'is-invalid invalid':errors.has('title')}" name="title" v-model="post.title" type="text" placeholder="Post Title" @focus="getPostTitle" @blur="generatePostHref">
 	    <small class="form-text text-danger" v-if="errors.has('title')" v-text="errors.get('title')"></small>
 	</div>
 		
@@ -42,6 +44,7 @@
 	<div class="form-group">
 		<label class="col-form-label">Content:</label>
 	    <textarea class="form-control" v-model="post.content" rows="5"></textarea>
+	    <small class="form-text text-danger" v-if="errors.has('content')" v-text="errors.get('content')"></small>
 	</div>
 	
 	<div class="form-group">
@@ -99,6 +102,7 @@
 </template>
 
 <script>
+import {Errors} from '../../error-handler.js';
 export default {
 	props: {
 		post: {required:true}
@@ -107,7 +111,8 @@ export default {
 	data() {
 		return {
 			errors: new Errors(),
-			journalists: []
+			journalists: [],
+			title:""
 		}
 	},
 	
@@ -115,41 +120,74 @@ export default {
 
 	},
 	watch:{
-		
+
 	},
 	methods:{
-		cancel(){
-			this.reset();
-			$('formModal').modal('hide');
+		cancel(){	
+			this.reset();		
+			$('#formModal').modal('hide');			
 		},
 		reset(){
 			this.errors = new Errors();
 		},
 		validate() {
-			this.errors = [];
-			this.validationErrors = {};
 			if(this.post.id !== undefined) {
 				this.update();
 			} else {
 				this.store();
 			}
 		},
-		generateHref(){
-			if(this.post.href === ""){
-				this.post.href = this.post.title.replace(/[^\w\d\s-]*/g, '').replace(/[\s_]/g, '-').toLowerCase();
+		getPostTitle(){
+			this.title = this.post.title;
+		},
+		generatePostHref(){
+			if(this.post.href === "" || this.title !== this.post.title){
+				this.post.href = this.post.title.trim()
+				.replace(/[^\w\d\s-]*/g, '')				
+				.replace(/\s\s+/g,' ')
+				.replace(/[\s_]/g, '-')			
+				.replace(/--*/g,'-')
+				.replace(/^-|-$/g,'')
+				.toLowerCase();
 			}
 		},
 		store(){
-			console.log(this.post);
-			this.reset();				
-			$('#formModal').modal('hide');
-			Event.$emit('reload');
+			axios.post('/admin/post', {
+				journalist_id: this.post.journalist_id,
+				title: this.post.title,
+				href: this.post.href,
+				content: this.post.content,
+				status: this.post.status,
+				likes: this.post.likes,
+				dislikes: this.post.dislikes,
+				date_posted: this.post.date_posted   				
+			})
+			.then(response => {				
+	            this.cancel();
+				Event.$emit('reload');
+			})
+			.catch(error => this.errors.record(error.response.data.errors));
+			
 		},
 		
-		update(){
-			console.log(this.post);
-			this.reset();				
-			$('#formModal').modal('hide');
+		update(){			
+			axios.patch('/admin/post/' + this.post.id, {
+				journalist_id: this.post.journalist_id,
+				title: this.post.title,
+				href: this.post.href,
+				content: this.post.content,
+				status: this.post.status,
+				likes: this.post.likes,
+				dislikes: this.post.dislikes,
+				date_posted: this.post.date_posted   				
+			})
+			.then(response => {				
+	            this.cancel();
+				Event.$emit('reload');
+			})
+			.catch(error => this.errors.record(error.response.data.errors));
+			
+			this.cancel();
 			Event.$emit('reload');
 		}	
 	},

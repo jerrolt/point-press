@@ -13,6 +13,7 @@
 						<th scope="col">Date</th>
 						<th scope="col">Title</th>
 						<th scope="col"></th>
+						<th scope="col"></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -20,14 +21,23 @@
 						<th colspan="3" scope="row">No posts available.</th>
 					</tr>
 					<tr v-if="posts.length > 0" v-for="(post, key) in posts" :class="{'text-danger':post.deleted_at!==null, 'text-secondary':post.deleted_at===null}">
-						<th scope="row">@{{post.name}}</th>
+						<td>@{{post.date_posted}}</td>
+						<th scope="row">@{{post.title}}</th>
 						<td></td>
-						<td></td>
+						<td class="text-right">
+							<div class="btn-group-sm">
+								<button class="btn btn-link" @click="initUpdate(post.id)">Edit</button>
+								<span class="text-secondary">.</span>
+								<button v-if="post.deleted_at===null" class="btn btn-link text-danger" @click="onRemove(key)">Remove</button>
+								<button v-if="post.deleted_at!==null" class="btn btn-link text-success" @click="onRestore(key)">Restore</button>
+								
+							</div>
+						</td>
 					</tr>			
 				</tbody>
 				<tfoot>
 					<tr>
-						<td colspan="3" class="text-center">pagination here</td>
+						<td colspan="4" class="text-center">pagination here</td>
 					</tr>
 				</tfoot>
 			</table>

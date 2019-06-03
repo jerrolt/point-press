@@ -51439,35 +51439,123 @@ __webpack_require__.r(__webpack_exports__);
 /*!***************************************!*\
   !*** ./resources/js/error-handler.js ***!
   \***************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! exports provided: Errors */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = function () {
-  this.errors = {};
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Errors", function() { return Errors; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-  this.has = function (field) {
-    return this.errors.hasOwnProperty(field);
-  };
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-  this.any = function () {
-    return Object.keys(this.errors).length > 0;
-  };
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-  this.get = function (field) {
-    if (this.errors[field]) {
-      return this.errors[field][0];
+/*
+module.exports = function() {
+	this.errors = {};
+		
+	this.has = function(field){
+		return this.errors.hasOwnProperty(field);
+		//return _.has(this.errors, 'errors.'+field);
+	}
+	
+	this.any = function(){
+		return (Object.keys(this.errors).length > 0);
+	}
+	
+	this.get = function(field){
+		if(this.errors[field]){
+			return this.errors[field][0];
+		}		
+	}
+		
+	this.record = function(errors){
+		this.errors = errors;
+	}
+	
+	this.clear = function(field){
+		//sweet way to delete a property from an object
+		delete this.errors[field];  
+	}
+}
+*/
+var Errors =
+/*#__PURE__*/
+function () {
+  /**
+   * Create a new Errors instance.
+   */
+  function Errors() {
+    _classCallCheck(this, Errors);
+
+    this.errors = {};
+  }
+  /**
+   * Determine if an errors exists for the given field.
+   *
+   * @param {string} field
+   */
+
+
+  _createClass(Errors, [{
+    key: "has",
+    value: function has(field) {
+      return this.errors.hasOwnProperty(field);
     }
-  };
+    /**
+     * Determine if we have any errors.
+     */
 
-  this.record = function (errors) {
-    this.errors = errors;
-  };
+  }, {
+    key: "any",
+    value: function any() {
+      return Object.keys(this.errors).length > 0;
+    }
+    /**
+     * Retrieve the error message for a field.
+     *
+     * @param {string} field
+     */
 
-  this.clear = function (field) {
-    //sweet way to delete a property from an object
-    delete this.errors[field];
-  };
-};
+  }, {
+    key: "get",
+    value: function get(field) {
+      if (this.errors[field]) {
+        return this.errors[field][0];
+      }
+    }
+    /**
+     * Record the new errors.
+     *
+     * @param {object} errors
+     */
+
+  }, {
+    key: "record",
+    value: function record(errors) {
+      this.errors = errors;
+    }
+    /**
+     * Clear one or all error fields.
+     *
+     * @param {string|null} field
+     */
+
+  }, {
+    key: "clear",
+    value: function clear(field) {
+      if (field) {
+        delete this.errors[field];
+        return;
+      }
+
+      this.errors = {};
+    }
+  }]);
+
+  return Errors;
+}();
 
 /***/ }),
 

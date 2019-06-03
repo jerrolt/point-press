@@ -34,4 +34,5 @@ Route::delete('/admin/website/permanent-delete/{website}', 'AdminWebsiteControll
 Route::resource('/admin/website', 'AdminWebsiteController');
 
 Route::get('/admin/posts', 'AdminPostController@all')->name('posts');
+Route::post('/admin/post/restore/{post}', 'AdminPostController@restore');
 Route::resource('/admin/post', 'AdminPostController');

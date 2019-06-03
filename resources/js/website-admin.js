@@ -7,7 +7,7 @@
 
 require('./bootstrap');
 
-window.Errors = require('./error-handler.js');
+//window.Errors = require('./error-handler.js');
 
 window.Vue = require('vue');
 window.Event = new Vue();
@@ -59,6 +59,7 @@ const app = new Vue({
 		
 		initUpdate(id){					
 			axios.get('/admin/website/' + id).then(response => {
+				console.log(response.data);
 				this.website = response.data.website;
 			});	
 			$('#formModal').modal('show');
