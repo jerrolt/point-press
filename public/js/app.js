@@ -2172,6 +2172,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _error_handler_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../error-handler.js */ "./resources/js/error-handler.js");
 //
 //
 //
@@ -2233,6 +2234,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2262,7 +2264,7 @@ __webpack_require__.r(__webpack_exports__);
         this.platform = _.cloneDeep(this.platforms[this.isUpdating]);
       }
 
-      this.$children[0].$data.errors = new Errors();
+      this.$children[0].$data.errors = new _error_handler_js__WEBPACK_IMPORTED_MODULE_0__["Errors"]();
       $("#formModal").modal("show");
     },
     loadPlatforms: function loadPlatforms() {
@@ -2308,6 +2310,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _error_handler_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../error-handler.js */ "./resources/js/error-handler.js");
 //
 //
 //
@@ -2328,6 +2331,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     platform: {
@@ -2336,7 +2340,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      errors: new Errors()
+      errors: new _error_handler_js__WEBPACK_IMPORTED_MODULE_0__["Errors"]()
     };
   },
   computed: {
@@ -2349,7 +2353,7 @@ __webpack_require__.r(__webpack_exports__);
       $('#formModal').modal('hide');
     },
     validate: function validate() {
-      this.errors = new Errors();
+      this.errors = new _error_handler_js__WEBPACK_IMPORTED_MODULE_0__["Errors"]();
 
       if (this.platform.id !== undefined) {
         this.update();
@@ -51067,9 +51071,9 @@ module.exports = function(module) {
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
-__webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
+__webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js"); //window.Errors = require('./error-handler.js');
 
-window.Errors = __webpack_require__(/*! ./error-handler.js */ "./resources/js/error-handler.js");
+
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
 /**
  * The following block of code may be used to automatically register your
@@ -51451,35 +51455,6 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-/*
-module.exports = function() {
-	this.errors = {};
-		
-	this.has = function(field){
-		return this.errors.hasOwnProperty(field);
-		//return _.has(this.errors, 'errors.'+field);
-	}
-	
-	this.any = function(){
-		return (Object.keys(this.errors).length > 0);
-	}
-	
-	this.get = function(field){
-		if(this.errors[field]){
-			return this.errors[field][0];
-		}		
-	}
-		
-	this.record = function(errors){
-		this.errors = errors;
-	}
-	
-	this.clear = function(field){
-		//sweet way to delete a property from an object
-		delete this.errors[field];  
-	}
-}
-*/
 var Errors =
 /*#__PURE__*/
 function () {
@@ -51500,7 +51475,15 @@ function () {
 
   _createClass(Errors, [{
     key: "has",
-    value: function has(field) {
+    value: function has(field, index) {
+      if (index !== undefined) {
+        if (this.errors.hasOwnProperty(field)) {
+          return this.errors[field].hasOwnProperty(index);
+        }
+
+        return false;
+      }
+
       return this.errors.hasOwnProperty(field);
     }
     /**
@@ -51520,7 +51503,13 @@ function () {
 
   }, {
     key: "get",
-    value: function get(field) {
+    value: function get(field, index) {
+      if (index !== undefined) {
+        if (this.errors[field][index]) {
+          return this.errors[field][index];
+        }
+      }
+
       if (this.errors[field]) {
         return this.errors[field][0];
       }
@@ -51534,6 +51523,8 @@ function () {
   }, {
     key: "record",
     value: function record(errors) {
+      console.log("Errors:");
+      console.log(errors);
       this.errors = errors;
     }
     /**

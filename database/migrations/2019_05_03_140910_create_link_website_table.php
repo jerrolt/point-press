@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePostWebsiteTable extends Migration
+class CreateLinkWebsiteTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreatePostWebsiteTable extends Migration
      */
     public function up()
     {
-        Schema::create('post_website', function (Blueprint $table) {
-            $table->increments('id');
-            $table->unsignedInteger('post_id');
-            $table->foreign('post_id')->references('id')->on('posts');
+        Schema::create('link_website', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedInteger('link_id');
+            //$table->foreign('link_id')->references('id')->on('links');
             $table->unsignedInteger('website_id');
             $table->foreign('website_id')->references('id')->on('websites');
-            $table->string('link',100)->nullable(false)->unique();
+            $table->timestamps();
         });
     }
 
@@ -30,6 +30,6 @@ class CreatePostWebsiteTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('post_website');
+        Schema::dropIfExists('link_website');
     }
 }

@@ -10,9 +10,10 @@
 			<table class="table table-sm table-hover">
 				<thead>
 					<tr class="text-white bg-secondary" >
-						<th scope="col">Date</th>
+						<th scope="col">Date</th>						
+						<th scope="col">Author</th>
 						<th scope="col">Title</th>
-						<th scope="col"></th>
+						<th scope="col">Sources</th>
 						<th scope="col"></th>
 					</tr>
 				</thead>
@@ -21,7 +22,8 @@
 						<th colspan="3" scope="row">No posts available.</th>
 					</tr>
 					<tr v-if="posts.length > 0" v-for="(post, key) in posts" :class="{'text-danger':post.deleted_at!==null, 'text-secondary':post.deleted_at===null}">
-						<td>@{{post.date_posted}}</td>
+						<td>@{{dateDisplay(new Date(post.date_posted))}}</td>						
+						<td>@{{fullname(post.journalist)}}</td>
 						<th scope="row">@{{post.title}}</th>
 						<td></td>
 						<td class="text-right">
@@ -37,12 +39,13 @@
 				</tbody>
 				<tfoot>
 					<tr>
-						<td colspan="4" class="text-center">pagination here</td>
+						<td colspan="5" class="text-center">pagination here</td>
 					</tr>
 				</tfoot>
 			</table>
 		</div>
 		<post-form :post="post"></post-form>
+
 	</div>
 	
 </div>

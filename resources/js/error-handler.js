@@ -1,33 +1,3 @@
-/*
-module.exports = function() {
-	this.errors = {};
-		
-	this.has = function(field){
-		return this.errors.hasOwnProperty(field);
-		//return _.has(this.errors, 'errors.'+field);
-	}
-	
-	this.any = function(){
-		return (Object.keys(this.errors).length > 0);
-	}
-	
-	this.get = function(field){
-		if(this.errors[field]){
-			return this.errors[field][0];
-		}		
-	}
-		
-	this.record = function(errors){
-		this.errors = errors;
-	}
-	
-	this.clear = function(field){
-		//sweet way to delete a property from an object
-		delete this.errors[field];  
-	}
-}
-*/
-
 export class Errors {
     /**
      * Create a new Errors instance.
@@ -36,16 +6,22 @@ export class Errors {
         this.errors = {};
     }
 
-
     /**
      * Determine if an errors exists for the given field.
      *
      * @param {string} field
      */
-    has(field) {
+    has(field,index) {
+	    if(index !== undefined)
+	    {
+		    if(this.errors.hasOwnProperty(field))
+		    {
+				return this.errors[field].hasOwnProperty(index);
+			}
+			return false;
+	    }
         return this.errors.hasOwnProperty(field);
     }
-
 
     /**
      * Determine if we have any errors.
@@ -54,28 +30,34 @@ export class Errors {
         return Object.keys(this.errors).length > 0;
     }
 
-
     /**
      * Retrieve the error message for a field.
      *
      * @param {string} field
      */
-    get(field) {
+    get(field,index) {
+	    if(index !== undefined)
+	    {
+		    if (this.errors[field][index]) 
+		    {
+            	return this.errors[field][index];
+        	}
+	    }
         if (this.errors[field]) {
             return this.errors[field][0];
         }
     }
-
-
+	
     /**
      * Record the new errors.
      *
      * @param {object} errors
      */
     record(errors) {
+	    console.log("Errors:");
+	    console.log(errors);
         this.errors = errors;
     }
-
 
     /**
      * Clear one or all error fields.

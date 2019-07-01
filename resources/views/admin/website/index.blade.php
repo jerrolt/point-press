@@ -35,8 +35,8 @@
 									<span class="text-secondary">.</span>
 									<button v-if="website.deleted_at===null" class="btn btn-link text-danger" @click="onRemove(key)">Remove</button>
 									 <button v-if="website.deleted_at!==null" class="btn btn-link text-success" @click="onRestore(key)">Restore</button>
-									 <span v-if="website.posts.length===0" class="text-secondary">.</span>
-									 <button v-if="website.posts.length===0" class="btn btn-link text-danger" @click="onPermanentDelete(key)">Permanent Delete</button>
+									 <span class="text-secondary">.</span>
+									 <button class="btn btn-link text-danger" @click="onPermanentDelete(key)">Permanent Delete</button>
 								</div>
 							</td>
 						</tr>

@@ -83,11 +83,37 @@
 			<small class="form-text text-danger" v-if="errors.has('dislikes')" v-text="errors.get('dislikes')"></small>
 		</div>
 	</div>	
+
+
+<div class="form-group">
+	    <label class="col-form-label">Links:</label>
+	    <div class="row">
+	    	<div class="col-sm-8">
+	    		<input type="text" class="form-control " v-model="link.url" placeholder="http://www.exampleLink.com...">
+	    	</div>
+	    	<div class="col-sm-4">
+				<button type="button" class="btn btn-primary btn-sm" @click="saveLink" :disabled="link.url===''">add link</button>
+				<small class="form-text text-danger" v-if="errors.has('links')" v-text="errors.get('links')"></small>
+			</div>
+	    </div>
+	    <ul v-if="post.links.length > 0" class="list-group list-group-flush">
+	    	<li v-for="(link, key) in post.links" class="list-group-item">	
+	    		<div class="btn-group btn-group-sm">  	
+	    			<button type="button" class="btn btn-link" @click="initLink(key)">edit</button>
+	    			<button type="button" class="btn btn-link" @click="removeLink(key)">remove</button>
+	    		</div>
+				{{link.url}}
+	    	</li>	    	
+	    </ul>
+	   
+	</div>
+
+
 		
 	<div class="form-group">
-		<div class="btn-group float-right">
-		<button type="button" class="btn btn-danger" @click="cancel">cancel</button>
-		<button type="button" class="btn btn-secondary" @click="validate" :disabled="errors.any()">save</button>
+		<div class="btn-group float-right" role="group">
+			<button type="button" class="btn btn-danger" @click="cancel">cancel</button>
+			<button type="button" class="btn btn-secondary" @click="validate" :disabled="errors.any()">save</button>
 		</div>
 	</div>
 </form>			    	
@@ -103,6 +129,7 @@
 
 <script>
 import {Errors} from '../../error-handler.js';
+
 export default {
 	props: {
 		post: {required:true}
@@ -112,23 +139,73 @@ export default {
 		return {
 			errors: new Errors(),
 			journalists: [],
-			title:""
+			title: '',
+			links: this.loadLinks(this.post.links),
+			link: {
+				id: 0, 
+				url: '', 
+				post_id: this.post.id
+			},
+			updateKey: -1
+			
 		}
 	},
 	
 	computed:{
 
 	},
-	watch:{
 
-	},
 	methods:{
+		loadLinks(postLinks){
+			var allLinks = []; 
+			postLinks.map(l => {
+				allLinks.push(l);
+			});
+			return allLinks;
+
+		},
+		initLink(key){
+			this.link = this.post.links[key];
+			this.updateKey = key;
+		},
+		saveLink(){
+			console.log(this.updateKey);
+			console.log(this.link);
+			this.link.post_id = this.post.id;
+			if(this.updateKey == -1){
+				console.log("adding link");
+				this.post.links.push(this.link);
+			} else {
+				console.log("updating link");
+				this.post.links[this.updateKey] = this.link;
+			}
+			this.resetLink();
+	
+		},
+		resetLink(){
+			this.link = {
+				id: 0, 
+				url: '', 
+				post_id: this.post.id
+			};
+			this.updateKey = -1;
+
+		},
+		removeLink(key){
+			this.post.links = this.post.links.slice(0, key).concat(this.post.links.slice(++key));
+
+		},
+		
+		
+		
 		cancel(){	
 			this.reset();		
 			$('#formModal').modal('hide');			
 		},
 		reset(){
 			this.errors = new Errors();
+			this.links = [];
+			this.resetLink();
 		},
 		validate() {
 			if(this.post.id !== undefined) {
@@ -151,6 +228,9 @@ export default {
 				.toLowerCase();
 			}
 		},
+		
+		
+		
 		store(){
 			axios.post('/admin/post', {
 				journalist_id: this.post.journalist_id,
@@ -160,7 +240,9 @@ export default {
 				status: this.post.status,
 				likes: this.post.likes,
 				dislikes: this.post.dislikes,
-				date_posted: this.post.date_posted   				
+				date_posted: this.post.date_posted,
+				
+				links: this.post.links 				
 			})
 			.then(response => {				
 	            this.cancel();
@@ -169,6 +251,7 @@ export default {
 			.catch(error => this.errors.record(error.response.data.errors));
 			
 		},
+		
 		
 		update(){			
 			axios.patch('/admin/post/' + this.post.id, {
@@ -179,7 +262,9 @@ export default {
 				status: this.post.status,
 				likes: this.post.likes,
 				dislikes: this.post.dislikes,
-				date_posted: this.post.date_posted   				
+				date_posted: this.post.date_posted,
+				
+				links: this.post.links  				
 			})
 			.then(response => {				
 	            this.cancel();
@@ -187,8 +272,8 @@ export default {
 			})
 			.catch(error => this.errors.record(error.response.data.errors));
 			
-			this.cancel();
-			Event.$emit('reload');
+			//this.cancel();
+			//Event.$emit('reload');
 		}	
 	},
 	

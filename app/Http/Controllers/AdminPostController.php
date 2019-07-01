@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 //Models that are used
 use App\Post;
 use App\Website;
+use App\Link;
 use App\Journalist;
 
 class AdminPostController extends Controller
@@ -34,9 +35,19 @@ class AdminPostController extends Controller
 	{		
 		$posts = Post::withTrashed()->orderByRaw('date_posted DESC, title ASC')->get(); 		
         return response()->json([
-            'posts' => $posts
+            'posts' => $posts->load('journalist','links')
         ], 200);
 	}
+	
+	/**
+	public function sources($id)
+	{
+		$post = Post::withTrashed()->where('id',$id)->first(); 
+        return response()->json([
+            'sources' => $post->load('sources')
+        ], 200);
+	}
+	**/
 	
     /**
      * Show the form for creating a new resource.
@@ -93,7 +104,7 @@ class AdminPostController extends Controller
     {
         $post = Post::withTrashed()->where('id',$id)->first(); 
         return response()->json([
-            'post' => $post
+            'post' => $post->load('links')
         ], 200);
     }
 
@@ -107,6 +118,9 @@ class AdminPostController extends Controller
     {
         //
     }
+
+
+
 
     /**
      * Update the specified resource in storage.
@@ -137,6 +151,28 @@ class AdminPostController extends Controller
             'dislikes'			=> 'required|integer|gte:0',
 		])->validate();
 		
+		foreach($request->links as $link)
+		{ 
+			Validator::make($link, [	
+			    'post_id'		=> 'required|integer|gt:0',		
+				'url'			=> [
+					'required',
+					'string',
+					'max:100',
+					Rule::unique('links', 'url')->ignore($link['id'])
+				],
+			])->validate();
+		}
+		//check for duplicate urls		
+		$errors = $this->__invalidLinks($request->links);
+		if($errors !== false)
+		{			
+			return response()->json([
+				            'message' 	=> 'Saving Sources failed.',
+				            'errors' 	=> $errors
+			], 422);
+		}
+				
 	    $post = Post::withTrashed()->where('id',$id)->first();	    
         $post->journalist_id = $request->journalist_id;
 	    $post->title = $request->title;
@@ -147,12 +183,68 @@ class AdminPostController extends Controller
 	    $post->dislikes = $request->dislikes;
 	    $post->date_posted = $request->date_posted;
         $post->save();
-	    
+	    	    
+	    Link::destroy($this->__linkDiff($id, $request->links));		
+	    foreach($request->links as $l)
+	    {	 
+		    if($l['id'])
+		    {
+			    $link = Link::find($l['id']);
+				$link->url = $l['url'];
+				$link->save();
+		    } else {
+			    Link::create([
+				    'post_id' 	=> $l['post_id'],
+				    'url' 		=> $l['url']
+			    ]);
+		    }	    	
+	    }
+			    
 	    return response()->json([
             'message' 	=> 'Post update successful',
-            'post' 		=> $post
+            'post' 		=> $post->load('links')
         ], 200);
     }
+    
+    /**
+     * Update the specified resource in storage.
+     */  
+    private function __linkDiff($post_id, $links)
+    {
+	    $oldlinks = [];
+	    $newlinks = [];
+	    $post = Post::find($post_id);
+	    foreach($post->links as $oldlink) {
+			$oldlinks[] = $oldlink->id;
+	    }
+	    
+	    foreach($links as $newlink) {
+		    if($newlink['id'] != 0) {
+		    	$newlinks[] = $newlink['id'];
+		    }
+	    }
+	    return array_diff($oldlinks, $newlinks);
+    }
+    
+    /**
+     * Update the specified resource in storage.
+     */    
+    private function __invalidLinks($links)
+    {
+	    foreach($links as $search_link) 
+	    {
+		    $keys = array_keys($links, $search_link);
+		    if(count($keys) > 1)
+		    {
+			    return ["links" => "Duplicate links aren't allowed"];
+		    }		    
+	    }
+	    return false;
+    }
+    
+    
+
+
 
     /**
      * Remove the specified resource from storage.

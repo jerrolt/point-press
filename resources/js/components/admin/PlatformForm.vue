@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import {Errors} from '../../error-handler.js';
 export default{
 	props: {
 		platform: {required:true}

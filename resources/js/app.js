@@ -7,7 +7,7 @@
 
 require('./bootstrap');
 
-window.Errors = require('./error-handler.js');
+//window.Errors = require('./error-handler.js');
 
 window.Vue = require('vue');
 

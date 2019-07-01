@@ -64,8 +64,8 @@ class AdminJournalistController extends Controller
         ]);
         
         $journalist = Journalist::create([
-	        'firstname' 	  	=> $request->firstname,
-	        'lastname'		  	=> $request->lastname,
+	        'firstname' 	  	=> ucfirst(strtolower($request->firstname)),
+	        'lastname'		  	=> ucfirst(strtolower($request->lastname)),
 	        'title'     	  	=> $request->title,
 	        'description'	  	=> $request->description,	        
 	        'facebook'		  	=> $request->facebook,

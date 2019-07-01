@@ -15,7 +15,7 @@ const app = new Vue({
     el: '#app',
     data: {
 		posts: [],
-		post:{}
+		post:{links:[]}
     },
     created(){
 	    Event.$on('reload', () => {this.loadPosts()});
@@ -40,12 +40,23 @@ const app = new Vue({
 			return today.getFullYear() + '-' + mm + '-' + dd;
 		}
 	},
-	methods:{	
+	methods:{
+		dateDisplay(d){
+			var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+			return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+		},	
+		fullname(journalist){
+			let fname = journalist.firstname.charAt(0).toUpperCase() + journalist.firstname.slice(1).toLowerCase();
+			let lname = journalist.lastname.charAt(0).toUpperCase() + journalist.lastname.slice(1).toLowerCase();
+			return fname + ' ' + lname;
+		},
+
 		loadPosts(){
 			axios.get('/admin/posts').then(response => { 
 				this.posts = response.data.posts; 
 			});
-		},
+		},	
+
 		initUpdate(id){					
 			axios.get('/admin/post/' + id).then(response => {
 				this.post = response.data.post;
@@ -61,7 +72,8 @@ const app = new Vue({
 				status: "pending",
 				likes: 0,
 				dislikes: 0,
-				date_posted: this.today				
+				date_posted: this.today,
+				links: []
 			}
 			$('#formModal').modal('show');
 		},

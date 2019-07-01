@@ -42,7 +42,7 @@ class AdminPlatformController extends Controller
 			->orderByRaw("deleted_at DESC, name ASC")
 			->get();
 		return response()->json([
-            'websites' => $websites->load('posts')
+            'websites' => $websites
         ], 200);
 	}
 	

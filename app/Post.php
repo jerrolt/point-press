@@ -32,12 +32,28 @@ class Post extends Model
     }
     
     /**
+     * Return a collection of Sources
+     *
+     * @return App\Comment
+          
+    public function sources()
+    {
+	    return $this->hasMany(Source::class, 'post_id');
+    }
+    */
+    public function links()
+    {
+	    return $this->hasMany(Link::class, 'post_id');
+    }
+    
+    /**
      * Return a collection of Websites
      *
      * @return App\Website
-     */   
+        
     public function websites()
     {
 		return $this->belongsToMany(Website::class, 'post_website', 'post_id', 'website_id');    
     }
+    */
 }

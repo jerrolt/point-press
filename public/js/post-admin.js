@@ -1867,6 +1867,32 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
@@ -1878,18 +1904,63 @@ __webpack_require__.r(__webpack_exports__);
     return {
       errors: new _error_handler_js__WEBPACK_IMPORTED_MODULE_0__["Errors"](),
       journalists: [],
-      title: ""
+      title: '',
+      links: this.loadLinks(this.post.links),
+      link: {
+        id: 0,
+        url: '',
+        post_id: this.post.id
+      },
+      updateKey: -1
     };
   },
   computed: {},
-  watch: {},
   methods: {
+    loadLinks: function loadLinks(postLinks) {
+      var allLinks = [];
+      postLinks.map(function (l) {
+        allLinks.push(l);
+      });
+      return allLinks;
+    },
+    initLink: function initLink(key) {
+      this.link = this.post.links[key];
+      this.updateKey = key;
+    },
+    saveLink: function saveLink() {
+      console.log(this.updateKey);
+      console.log(this.link);
+      this.link.post_id = this.post.id;
+
+      if (this.updateKey == -1) {
+        console.log("adding link");
+        this.post.links.push(this.link);
+      } else {
+        console.log("updating link");
+        this.post.links[this.updateKey] = this.link;
+      }
+
+      this.resetLink();
+    },
+    resetLink: function resetLink() {
+      this.link = {
+        id: 0,
+        url: '',
+        post_id: this.post.id
+      };
+      this.updateKey = -1;
+    },
+    removeLink: function removeLink(key) {
+      this.post.links = this.post.links.slice(0, key).concat(this.post.links.slice(++key));
+    },
     cancel: function cancel() {
       this.reset();
       $('#formModal').modal('hide');
     },
     reset: function reset() {
       this.errors = new _error_handler_js__WEBPACK_IMPORTED_MODULE_0__["Errors"]();
+      this.links = [];
+      this.resetLink();
     },
     validate: function validate() {
       if (this.post.id !== undefined) {
@@ -1917,7 +1988,8 @@ __webpack_require__.r(__webpack_exports__);
         status: this.post.status,
         likes: this.post.likes,
         dislikes: this.post.dislikes,
-        date_posted: this.post.date_posted
+        date_posted: this.post.date_posted,
+        links: this.post.links
       }).then(function (response) {
         _this.cancel();
 
@@ -1937,16 +2009,16 @@ __webpack_require__.r(__webpack_exports__);
         status: this.post.status,
         likes: this.post.likes,
         dislikes: this.post.dislikes,
-        date_posted: this.post.date_posted
+        date_posted: this.post.date_posted,
+        links: this.post.links
       }).then(function (response) {
         _this2.cancel();
 
         Event.$emit('reload');
       })["catch"](function (error) {
         return _this2.errors.record(error.response.data.errors);
-      });
-      this.cancel();
-      Event.$emit('reload');
+      }); //this.cancel();
+      //Event.$emit('reload');
     }
   },
   mounted: function mounted() {
@@ -37844,27 +37916,148 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group" }, [
-                    _c("div", { staticClass: "btn-group float-right" }, [
-                      _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-danger",
-                          attrs: { type: "button" },
-                          on: { click: _vm.cancel }
-                        },
-                        [_vm._v("cancel")]
-                      ),
+                    _c("label", { staticClass: "col-form-label" }, [
+                      _vm._v("Links:")
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "col-sm-8" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.link.url,
+                              expression: "link.url"
+                            }
+                          ],
+                          staticClass: "form-control ",
+                          attrs: {
+                            type: "text",
+                            placeholder: "http://www.exampleLink.com..."
+                          },
+                          domProps: { value: _vm.link.url },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(_vm.link, "url", $event.target.value)
+                            }
+                          }
+                        })
+                      ]),
                       _vm._v(" "),
-                      _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-secondary",
-                          attrs: { type: "button", disabled: _vm.errors.any() },
-                          on: { click: _vm.validate }
-                        },
-                        [_vm._v("save")]
-                      )
-                    ])
+                      _c("div", { staticClass: "col-sm-4" }, [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary btn-sm",
+                            attrs: {
+                              type: "button",
+                              disabled: _vm.link.url === ""
+                            },
+                            on: { click: _vm.saveLink }
+                          },
+                          [_vm._v("add link")]
+                        ),
+                        _vm._v(" "),
+                        _vm.errors.has("links")
+                          ? _c("small", {
+                              staticClass: "form-text text-danger",
+                              domProps: {
+                                textContent: _vm._s(_vm.errors.get("links"))
+                              }
+                            })
+                          : _vm._e()
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _vm.post.links.length > 0
+                      ? _c(
+                          "ul",
+                          { staticClass: "list-group list-group-flush" },
+                          _vm._l(_vm.post.links, function(link, key) {
+                            return _c(
+                              "li",
+                              { staticClass: "list-group-item" },
+                              [
+                                _c(
+                                  "div",
+                                  { staticClass: "btn-group btn-group-sm" },
+                                  [
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-link",
+                                        attrs: { type: "button" },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.initLink(key)
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("edit")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-link",
+                                        attrs: { type: "button" },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.removeLink(key)
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("remove")]
+                                    )
+                                  ]
+                                ),
+                                _vm._v(
+                                  "\n\t\t\t\t" + _vm._s(link.url) + "\n\t    \t"
+                                )
+                              ]
+                            )
+                          }),
+                          0
+                        )
+                      : _vm._e()
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c(
+                      "div",
+                      {
+                        staticClass: "btn-group float-right",
+                        attrs: { role: "group" }
+                      },
+                      [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-danger",
+                            attrs: { type: "button" },
+                            on: { click: _vm.cancel }
+                          },
+                          [_vm._v("cancel")]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-secondary",
+                            attrs: {
+                              type: "button",
+                              disabled: _vm.errors.any()
+                            },
+                            on: { click: _vm.validate }
+                          },
+                          [_vm._v("save")]
+                        )
+                      ]
+                    )
                   ])
                 ]
               )
@@ -50163,35 +50356,6 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-/*
-module.exports = function() {
-	this.errors = {};
-		
-	this.has = function(field){
-		return this.errors.hasOwnProperty(field);
-		//return _.has(this.errors, 'errors.'+field);
-	}
-	
-	this.any = function(){
-		return (Object.keys(this.errors).length > 0);
-	}
-	
-	this.get = function(field){
-		if(this.errors[field]){
-			return this.errors[field][0];
-		}		
-	}
-		
-	this.record = function(errors){
-		this.errors = errors;
-	}
-	
-	this.clear = function(field){
-		//sweet way to delete a property from an object
-		delete this.errors[field];  
-	}
-}
-*/
 var Errors =
 /*#__PURE__*/
 function () {
@@ -50212,7 +50376,15 @@ function () {
 
   _createClass(Errors, [{
     key: "has",
-    value: function has(field) {
+    value: function has(field, index) {
+      if (index !== undefined) {
+        if (this.errors.hasOwnProperty(field)) {
+          return this.errors[field].hasOwnProperty(index);
+        }
+
+        return false;
+      }
+
       return this.errors.hasOwnProperty(field);
     }
     /**
@@ -50232,7 +50404,13 @@ function () {
 
   }, {
     key: "get",
-    value: function get(field) {
+    value: function get(field, index) {
+      if (index !== undefined) {
+        if (this.errors[field][index]) {
+          return this.errors[field][index];
+        }
+      }
+
       if (this.errors[field]) {
         return this.errors[field][0];
       }
@@ -50246,6 +50424,8 @@ function () {
   }, {
     key: "record",
     value: function record(errors) {
+      console.log("Errors:");
+      console.log(errors);
       this.errors = errors;
     }
     /**
@@ -50294,7 +50474,9 @@ var app = new Vue({
   el: '#app',
   data: {
     posts: [],
-    post: {}
+    post: {
+      links: []
+    }
   },
   created: function created() {
     var _this = this;
@@ -50324,6 +50506,15 @@ var app = new Vue({
     }
   },
   methods: {
+    dateDisplay: function dateDisplay(d) {
+      var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+    },
+    fullname: function fullname(journalist) {
+      var fname = journalist.firstname.charAt(0).toUpperCase() + journalist.firstname.slice(1).toLowerCase();
+      var lname = journalist.lastname.charAt(0).toUpperCase() + journalist.lastname.slice(1).toLowerCase();
+      return fname + ' ' + lname;
+    },
     loadPosts: function loadPosts() {
       var _this2 = this;
 
@@ -50348,7 +50539,8 @@ var app = new Vue({
         status: "pending",
         likes: 0,
         dislikes: 0,
-        date_posted: this.today
+        date_posted: this.today,
+        links: []
       };
       $('#formModal').modal('show');
     },

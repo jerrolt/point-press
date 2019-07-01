@@ -49648,35 +49648,6 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-/*
-module.exports = function() {
-	this.errors = {};
-		
-	this.has = function(field){
-		return this.errors.hasOwnProperty(field);
-		//return _.has(this.errors, 'errors.'+field);
-	}
-	
-	this.any = function(){
-		return (Object.keys(this.errors).length > 0);
-	}
-	
-	this.get = function(field){
-		if(this.errors[field]){
-			return this.errors[field][0];
-		}		
-	}
-		
-	this.record = function(errors){
-		this.errors = errors;
-	}
-	
-	this.clear = function(field){
-		//sweet way to delete a property from an object
-		delete this.errors[field];  
-	}
-}
-*/
 var Errors =
 /*#__PURE__*/
 function () {
@@ -49697,7 +49668,15 @@ function () {
 
   _createClass(Errors, [{
     key: "has",
-    value: function has(field) {
+    value: function has(field, index) {
+      if (index !== undefined) {
+        if (this.errors.hasOwnProperty(field)) {
+          return this.errors[field].hasOwnProperty(index);
+        }
+
+        return false;
+      }
+
       return this.errors.hasOwnProperty(field);
     }
     /**
@@ -49717,7 +49696,13 @@ function () {
 
   }, {
     key: "get",
-    value: function get(field) {
+    value: function get(field, index) {
+      if (index !== undefined) {
+        if (this.errors[field][index]) {
+          return this.errors[field][index];
+        }
+      }
+
       if (this.errors[field]) {
         return this.errors[field][0];
       }
@@ -49731,6 +49716,8 @@ function () {
   }, {
     key: "record",
     value: function record(errors) {
+      console.log("Errors:");
+      console.log(errors);
       this.errors = errors;
     }
     /**
